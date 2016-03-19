@@ -1,0 +1,104 @@
+---
+layout: post
+comments: false
+title:  "A Little About Poker Staking"
+excerpt: "Analysis of poker staking statistics (15k+ deals) parsed from mttmarket.com. That's the first real life application of my programming and data analysis skills, so I'm kind of proud of this though there was a lot of shitty code involved."
+date:   2016-02-14 00:00:00
+mathjax: false
+---
+
+In October 2015 I parsed information about 15k poker staking deals from mttmarket.com using Python along with BeautifulSoup and Selenium for getting data and numpy/matplotlib for the analysis. This is a translated and extended version of the [post I wrote on a Russian poker forum](http://forum.gipsyteam.ru/index.php?showtopic=106780) after originally doing  analysis of this data in October 2015.
+
+If you are not familiar with poker staking industry below are some examples to help to understand this post.
+
+### Very brief overview of the poker staking industry
+
+One of the ways to make money (besides playing yourself) is to invest in a player. To put it simple, you pay a share of the tournaments entry fee (buy-ins) and get a share of player's profits. There are several kinds of these deals but since all 15k deals I collected are of the same type (called markup), that's the one I'll explain in the examples below.
+
+
+**Simple example:** A player is going to enter several tournaments for which he would need to pay $200. The player doesn't want to pay that much and sells 50% of his tournaments buy-ins for $100. You buy it. Then, suppose, the player gets $500 of prize money for which you own 50% = $250, making a profit of $250 - $100 = $150
+
+**A little more complex example:** As often happens, if a player thinks she is way better than average opponent, she can ask investor for an additional fee by assigning a coefficient. So let's say we have the same situation as earlier - a player sells 50% of $200 worth tournaments buy-ins. Only this time the player adds a coefficient of 1.1, meaning that to buy $100 of players shares you have to pay $100*1.1 = $110 (side note: this coefficient is called mark-up, though in Russian community it's called simply 'coefficient' ('coef', 'kef')). This additional $10 goes to the player directly and does not depend on whether she will make a profit or not. The rest is the same as in previous example: in case of profit of $500 you own 50% of it = $250 making this time a profit of $250 - $110 = $140. Doesn't seem like this additional $10 you've paid made a difference, right? We'll return to this topic later.
+
+
+### Data Analysis
+
+So I originally started this analysis to build some kind of strategy for buying players' shares. Of course, before starting to bet money, I wanted to know some statistics: what's the market volume, how many deals were profitable, how much money did investors (stakers) made, maybe identify some attributes of profitable deals, etc. The problem was that most of the deals are made on poker forums and it's (nearly) impossible to extract data since there's no structure.
+Fortunately, I found mttmarket, which displays deals in structured format, making them (relatively) easy to parse which resulted in the information about 15147 staking deals. So, let's get started!
+
+### Here's some general statistics:
+
+-Deals were collected for the period: 20.12.2013-17.10.2015;
+
+-Total number of deals: 15147;
+
+-Tournaments played: 385217;
+
+-Total amount of buy-ins (BI): $8051863 sold, $5929976 used (players can ometimes miss the tournaments, in that case money are returned back to investors);
+
+-Total profit: $864039
+
+### Now, let's look at some charts:
+
+Good news, everyone: here's total profit over time:
+
+<div class="imgcap">
+<img src="/assets/staking/profit_vs_time.png">
+<div class="thecap" style="text-align:center">All players profit vs. time</div>
+</div>
+
+That's really impressive, considering the fact that about 90% of players are losing money. So as soon as most of the  players on the mttmarket are winning money, we can make profit even without detailed analysis of each deal. And if we bought, say, 10% of each deal we would make about $80k - awesome, right?! Well, maybe a little less than $80k, since part of the profit will be spend on paying coefficients (mark-ups). By the way, it would be interesting to see stakers' profit after taking mark-ups into account. And here's the graph:
+
+<div class="imgcap">
+<img src="/assets/staking/all_profit_vs_time.png">
+<div class="thecap" style="text-align:center">All players & investors profit vs. time</div>
+</div>
+
+Oops. At first I thought that I made a mistake in a formula but turns out it was correct - in general stakers are losing money. On a second glance it makes sense - average mark-up is 1.16, meaning -16% in ROI for the investor, meanwhile the ROI is (Total profit)/(Total BI) = 14.6%
+
+For comparison, here's what the chart would look like if all coefficients were 1.1:
+
+<div class="imgcap">
+<img src="/assets/staking/1-1_prof_vs_time.png">
+<div class="thecap" style="text-align:center">Simulation of profit vs. time for the mark-up = 1.1.</div>
+</div>
+
+
+And here's the chart in case all coefficients were 1.0:
+
+<div class="imgcap">
+<img src="/assets/staking/1-0_prof_vs_time.png">
+<div class="thecap" style="text-align:center">Simulation of profit vs. time for the mark-up = 1.0.</div>
+</div>
+
+As you can see, these additional player fee while looking small actually makes a huge difference. The last chart looks more like fair deal to me. Almost all poker players/investors know that coefficients affect profitability of a deal, but I think most of them underestimate its influence. How else can be explained the fact that even people with clearly way too high mark-up get staked? Also, consider the fact that most of the players (90%+) sell shares for the more expensive tournaments that they usually play.
+
+Mttmarket also provides some stats for each player, including total number of tournaments played, ROI, etc - all imported from Sharkscope. You could probably think that if you pick a player that has quite high ROI on historical data, you are making a good deal. Here are some numbers to show how reliable are that stats:
+
+-For players who were staked for 500+ tournaments, 73% showed lower ROI for staked tournaments than ROI for all tournaments in total;
+
+-According to the Sharkscope data displayed on Mttmarket, 94% of players are profitable in total and 83% made profit in the last year. What's the number of players who made profit in the tournaments for which they were staked? 57%. And how many of them were profitable to the investors? *37%*
+
+
+Another interesting observation is ABI (average buy-in) of the deal vs. mark-up. Number of deals with different mark-ups looks like this:
+
+<div class="imgcap">
+<img src="/assets/staking/used_coefs.png">
+<div class="thecap" style="text-align:center"></div>
+</div>
+
+As long as most of the deals are made with coefficients from 1.15 to 1.18 it's reasonable to look at ABI only for them:
+
+<div class="imgcap">
+<img src="/assets/staking/abi_vs_coef.png">
+<div class="thecap" style="text-align:center"></div>
+</div>
+
+Hmm, looks like, the more ABI, the more coefficient. If we'd look for 1.19 it'd be higher than for 1.18, and 1.20 even higher. Makes sense, because the more ABI is, the less is skill of the opponents, right?
+
+<div class="imgcap">
+<img src="/assets/staking/jchan.jpg">
+<div class="thecap" style="text-align:center"></div>
+</div>
+
+That's it. To conclude, I'd say that high coefficients are killing staking industry (at least according to the data from mttmarket). Most of the investors are losing money because they are unaware how these coefficients affect their profits and poker forums and sites like mttmarket don't post this kind of information anywhere.
